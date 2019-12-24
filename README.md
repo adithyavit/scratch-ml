@@ -34,8 +34,8 @@ Using random initialization for second time:
 
 Using farthest from the first for the second time:
 
-![](images/farthest_from_first_2.png)
+![](images/farthest_from_first2.png)
 
-Conclusion:
+### Conclusion:
 The objective function, goes down from 800 to 10 as the numbers of clusters increase. This is in
 line with what we are expected to get.
