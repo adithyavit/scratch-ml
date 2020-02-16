@@ -3,7 +3,8 @@ import math
 from scipy.io import loadmat
 
 #load the data
-data= loadmat(‘mnist_data.mat’) 
+data= loadmat('mnist_data.mat') 
+
 
 #Load trX, trY, tsX, tsY
 trX = data['trX']
@@ -14,6 +15,7 @@ trY = data['trY']
 print("the shape of trY is "+ str(trY.shape))
 tsY = data['tsY']
 print("the shape of tsY is "+ str(tsY.shape))
+
 
 
 #convert them to numpy arrays
@@ -33,73 +35,77 @@ for count, i in enumerate(trY[0]):
     if i == 1:
         x8.append(trX[count])
 
-
-
 def Mean(data):
     return np.mean(data,axis=1)
-#calculate means for entire dataset
-DataMean = Mean(trX)
-
-#calculate means for each class
-class7Mean = Mean(x7)
-class8Mean = Mean(x8)
 
 def Stdev(data):
     return np.std(data,axis=1)
 
-#calculate standard deviations for entire dataset
-DataStdev = Stdev(trX)
+#calculate means for each class
+class7f1 = Mean(x7)
+class8f1 = Mean(x8)
 
 #calculate standard deviations for each class
-class7std = Stdev(x7)
-class8std = Stdev(x8)
+class7f2 = Stdev(x7)
+class8f2 = Stdev(x8)
+
+
+class7f1_mean = class7f1.mean()
+class7f1_std = class7f1.std()
+class8f1_mean = class8f1.mean()
+class8f1_std = class8f1.std()
+
+class7f2_mean = class7f2.mean()
+class7f2_std = class7f2.std()
+class8f2_mean = class8f2.mean()
+class8f2_std = class8f2.std()
 
 #calculate class probabilities using gaussian function
 def GaussProb(x,mean,stdev):
     prob = (1/(stdev*(math.sqrt(2*math.pi))))*(math.exp(-0.5*((x-mean)/stdev)**2)) 
     return prob
 
-print(GaussProb(tsX[0][0],class7Mean[0], class7std[0]))
-#output: 1.2047399538597614
-
-def probClass7(inputvec):
-    ans = 1
-    for count, i in enumerate(inputvec):
-        ans *= GaussProb(i,class7Mean[count],class7std[count])
+def probClass7(i):
+    ans = GaussProb(i[0],class7f1_mean,class7f1_std)*GaussProb(i[1],class7f2_mean,class7f2_std)
     return ans
-def probClass8(inputvec):
-    ans = 1
-    for count, i in enumerate(inputvec):
-        ans *= GaussProb(i,class8Mean[count],class8std[count])
+def probClass8(i):
+    ans = GaussProb(i[0],class8f1_mean,class8f1_std)*GaussProb(i[1],class8f2_mean,class8f2_std)
     return ans
 
-def testDataPrediction(tsX):
+def testDataPrediction(ts_features):
     ans = []
-    for i in tsX:
+    for i in ts_features:
+        if1 = i[0]
+        if2 = i[1]
         prob7 = probClass7(i)
-        #print(prob7)
         prob8 = probClass8(i)
-        #print(prob8)
+
         if prob7 > prob8:
             ans.append(0.0)
         else:
             ans.append(1.0)
     return ans
 
-#give mean and std as two featuers instead of entire pixels
-tsX = [np.mean(tsX, axis=1),np.std(tsX, axis=1)]
+print(GaussProb(tsX[0][0],class7f1_mean,class7f1_std))
 
-finalAnswer = testDataPrediction(tsX)
+
+ts_features =  [tsX.mean(1), tsX.std(1)]
+ts_features = np.transpose(ts_features)
+
+prediction = testDataPrediction(ts_features)
+
+groundTruth = tsY
 
 #define overall Accuracy
 def overallAccuracy(prediction, groundTruth):
 	correct = 0
-	for count, i in enumerate(output):
+	for count, i in enumerate(prediction):
 		if i == tsY[0][count]:
 			correct+=1
 	overallAccuracy = correct/(tsY[0].shape)[0]
 	return overallAccuracy
 
+overallAccuracy(prediction,groundTruth)
 
 def classAccuracies(prediction, groundTruth):
     count7right = 0
@@ -118,7 +124,8 @@ def classAccuracies(prediction, groundTruth):
             count8right += 1
     return [count7right/count7, count8right/count8]
 
-overallAccuracy(finalAnswer, tsY[0])
-#output: 0.7032967032967034
-classAccuracies(finalAnswer, tsY[0])
-#output: [0.7402723735408561, 0.6642710472279261]
+
+
+classAccuracies(prediction, tsY[0])
+
+overallAccuracy(prediction, tsY[0])
