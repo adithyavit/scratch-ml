@@ -77,8 +77,8 @@ def testDataPrediction(ts_features):
     for i in ts_features:
         if1 = i[0]
         if2 = i[1]
-        prob7 = probClass7(i)
-        prob8 = probClass8(i)
+        prob7 = probClass7(i)*(len(x7)/len(x7)+len(x8))
+        prob8 = probClass8(i)*(len(x8)/len(x7)+len(x8))
 
         if prob7 > prob8:
             ans.append(0.0)
