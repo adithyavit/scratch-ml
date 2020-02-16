@@ -86,6 +86,8 @@ def testDataPrediction(tsX):
             ans.append(1.0)
     return ans
 
+#give mean and std as two featuers instead of entire pixels
+tsX = [np.mean(tsX, axis=1),np.std(tsX, axis=1)]
 
 finalAnswer = testDataPrediction(tsX)
 
